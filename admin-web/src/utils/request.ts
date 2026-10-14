@@ -12,9 +12,20 @@ const request = axios.create({
 request.interceptors.request.use(
   (config) => {
     const userStore = useUserStore()
-    if (userStore.token) {
-      config.headers.Authorization = `Bearer ${userStore.token}`
+    
+    // 平台后台接口用 platform_token
+    if (config.url?.startsWith('/platform')) {
+      const platformToken = localStorage.getItem('platform_token')
+      if (platformToken) {
+        config.headers.Authorization = `Bearer ${platformToken}`
+      }
+    } else {
+      // 店铺后台接口用店铺 token
+      if (userStore.token) {
+        config.headers.Authorization = `Bearer ${userStore.token}`
+      }
     }
+    
     return config
   },
   (error) => {

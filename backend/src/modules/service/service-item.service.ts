@@ -43,4 +43,11 @@ export class ServiceItemService {
     await this.serviceRepo.update({ id, tenantId }, { status: 0 });
     return { success: true };
   }
+
+  async findByTenant(tenantId: number) {
+    return this.serviceRepo.find({
+      where: { tenantId, status: 1 },
+      order: { sort: 'ASC' },
+    });
+  }
 }

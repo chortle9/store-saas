@@ -8,7 +8,7 @@ export const useUserStore = defineStore('user', () => {
   const tenantInfo = ref<any>(null)
 
   async function loginAction(username: string, password: string) {
-    const res = await login(username, password)
+    const res = await login({ username, password })
     token.value = res.token
     userInfo.value = res.user
     tenantInfo.value = res.tenant

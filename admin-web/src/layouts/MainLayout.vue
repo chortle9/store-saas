@@ -77,6 +77,9 @@ const menuList = [
   { path: '/card', title: '卡项管理', icon: 'CreditCard' },
   { path: '/order', title: '订单收银', icon: 'ShoppingCart' },
   { path: '/marketing', title: '营销中心', icon: 'Promotion' },
+  { path: '/stock', title: '库存管理', icon: 'Box' },
+  { path: '/report', title: '数据报表', icon: 'DataAnalysis' },
+  { path: '/website', title: '网站设置', icon: 'Monitor' },
   { path: '/staff', title: '员工管理', icon: 'Avatar' },
   { path: '/setting', title: '店铺设置', icon: 'Setting' },
 ]

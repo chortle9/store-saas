@@ -35,6 +35,12 @@ export class Member {
   @Column({ default: 0, comment: '积分' })
   points: number;
 
+  @Column({ default: 1, comment: '会员等级ID' })
+  levelId: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0, comment: '累计消费金额' })
+  totalConsume: number;
+
   @Column({ nullable: true, comment: '备注/过敏信息/禁忌' })
   remark: string;
 

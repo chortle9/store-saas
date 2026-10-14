@@ -16,7 +16,16 @@ export class TenantGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
     
-    if (!user || !user.tenantId) {
+    if (!user) {
+      throw new ForbiddenException('用户信息缺失');
+    }
+
+    // 平台管理员（isPlatform=true）跨租户，不强制 tenantId
+    if (user.isPlatform) {
+      return true;
+    }
+
+    if (!user.tenantId) {
       throw new ForbiddenException('租户信息缺失');
     }
 

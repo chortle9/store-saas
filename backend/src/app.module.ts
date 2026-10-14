@@ -17,6 +17,13 @@ import { OrderItem } from './modules/order/order-item.entity';
 import { Coupon } from './modules/marketing/coupon.entity';
 import { MemberCoupon } from './modules/marketing/member-coupon.entity';
 import { Notice } from './modules/notice/notice.entity';
+import { MemberLevel } from './modules/member/member-level.entity';
+import { PointsRecord } from './modules/member/points-record.entity';
+import { RechargeRecord } from './modules/member/recharge-record.entity';
+import { StockProduct } from './modules/stock/stock-product.entity';
+import { MarketingActivity } from './modules/marketing/marketing-activity.entity';
+import { TenantWebsite } from './modules/website/website.entity';
+import { OperationLog } from './modules/log/operation-log.entity';
 
 // 模块
 import { AuthModule } from './modules/auth/auth.module';
@@ -30,6 +37,10 @@ import { MarketingModule } from './modules/marketing/marketing.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { StaffModule } from './modules/staff/staff.module';
 import { NoticeModule } from './modules/notice/notice.module';
+import { PlatformModule } from './modules/platform/platform.module';
+import { StockModule } from './modules/stock/stock.module';
+import { WebsiteModule } from './modules/website/website.module';
+import { ReportModule } from './modules/report/report.module';
 
 // 守卫
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
@@ -46,7 +57,9 @@ import { TenantGuard } from './common/guards/tenant.guard';
       database: process.env.DB_DATABASE || 'store_saas',
       entities: [
         Tenant, User, Member, Appointment, ServiceItem, Staff,
-        Card, CardRecord, Order, OrderItem, Coupon, MemberCoupon, Notice
+        Card, CardRecord, Order, OrderItem, Coupon, MemberCoupon, Notice,
+        MemberLevel, PointsRecord, RechargeRecord, StockProduct,
+        MarketingActivity, TenantWebsite, OperationLog
       ],
       synchronize: true, // 开发环境自动建表，生产环境请用迁移
       timezone: '+08:00',
@@ -62,6 +75,10 @@ import { TenantGuard } from './common/guards/tenant.guard';
     DashboardModule,
     StaffModule,
     NoticeModule,
+    PlatformModule,
+    StockModule,
+    WebsiteModule,
+    ReportModule,
   ],
   providers: [
     JwtService,

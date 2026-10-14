@@ -8,6 +8,10 @@ async function bootstrap() {
   // 全局前缀
   app.setGlobalPrefix('api');
   
+  // 增大请求体大小限制（支持base64图片上传）
+  app.use(require('express').json({ limit: '50mb' }));
+  app.use(require('express').urlencoded({ limit: '50mb', extended: true }));
+  
   // 全局验证管道
   app.useGlobalPipes(new ValidationPipe({
     transform: true,

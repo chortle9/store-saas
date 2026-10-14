@@ -20,9 +20,7 @@ export class AuthService {
    * 账号密码登录
    */
   async login(username: string, password: string) {
-    console.log('=== 登录请求参数 ===', { username, password, passwordType: typeof password });
     const user = await this.userRepo.findOne({ where: { username } });
-    console.log('=== 查到的用户 ===', { userExists: !!user, userPassword: user?.password });
     if (!user || user.status !== 1) {
       throw new UnauthorizedException('账号不存在或已禁用');
     }
