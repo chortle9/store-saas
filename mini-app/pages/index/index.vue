@@ -1,90 +1,194 @@
 <template>
   <view class="container">
-    <!-- 店铺头图 -->
-    <view class="banner">
-      <view class="banner-content">
-        <view class="shop-name">店小伴美容</view>
-        <view class="shop-desc">专业美肤护理 · 让美丽更简单</view>
-      </view>
-    </view>
+    <!-- 轮播Banner -->
+    <swiper class="banner-swiper" indicator-dots autoplay circular indicator-active-color="#fff">
+      <swiper-item v-for="(banner, index) in banners" :key="index">
+        <image class="banner-img" :src="banner.image" mode="aspectFill" v-if="banner.image" />
+        <view v-else class="banner-placeholder">
+          <view class="banner-title">{{ banner.title || shopInfo.title }}</view>
+          <view class="banner-sub">{{ banner.subtitle || shopInfo.subtitle }}</view>
+        </view>
+      </swiper-item>
+    </swiper>
 
     <!-- 快捷入口 -->
     <view class="quick-entry">
-      <view class="entry-item" @click="goToAppointment">
+      <view class="entry-item" @click="goTab('/pages/appointment/index')">
         <view class="entry-icon" style="background: #667eea">📅</view>
         <text>在线预约</text>
       </view>
-      <view class="entry-item">
+      <view class="entry-item" @click="goPage('/pages/coupons/index')">
         <view class="entry-icon" style="background: #f5576c">🎫</view>
         <text>优惠券</text>
       </view>
-      <view class="entry-item">
+      <view class="entry-item" @click="goTab('/pages/member/index')">
         <view class="entry-icon" style="background: #4facfe">👤</view>
         <text>会员卡</text>
       </view>
-      <view class="entry-item">
+      <view class="entry-item" @click="goTab('/pages/my/index')">
         <view class="entry-icon" style="background: #43e97b">⭐</view>
-        <text>我的收藏</text>
+        <text>个人中心</text>
       </view>
+    </view>
+
+    <!-- 门店介绍 -->
+    <view class="section">
+      <view class="section-title">
+        <text>关于我们</text>
+      </view>
+      <view class="about-text">{{ shopInfo.aboutUs || '专业美业护理，让美丽更简单' }}</view>
     </view>
 
     <!-- 热门项目 -->
     <view class="section">
       <view class="section-title">
-        <text>热门项目</text>
-        <text class="more">更多 ></text>
+        <text>热门服务项目</text>
+        <text class="more" @click="showTip('更多服务敬请期待')">更多 ></text>
       </view>
       <view class="service-list">
-        <view class="service-item" v-for="item in services" :key="item.id">
-          <image class="service-img" :src="item.image" mode="aspectFill" />
+        <view class="service-item" v-for="item in services" :key="item.id" @click="goTab('/pages/appointment/index')">
+          <view class="service-img-placeholder">💆</view>
           <view class="service-info">
             <view class="service-name">{{ item.name }}</view>
-            <view class="service-duration">{{ item.duration }}分钟</view>
-            <view class="service-price">¥{{ item.price }}</view>
+            <view class="service-desc">{{ item.description || '专业技师服务' }}</view>
+            <view class="service-bottom">
+              <text class="service-price">¥{{ item.price }}</text>
+              <text class="service-duration">{{ item.duration || 60 }}分钟</text>
+            </view>
           </view>
-          <view class="service-btn" @click="goToAppointment">预约</view>
         </view>
+      </view>
+    </view>
+
+    <!-- 门店环境 -->
+    <view class="section" v-if="envImages.length > 0">
+      <view class="section-title">
+        <text>门店环境</text>
+      </view>
+      <scroll-view scroll-x class="env-scroll">
+        <image v-for="(img, index) in envImages" :key="index" class="env-img" :src="img" mode="aspectFill" />
+      </scroll-view>
+    </view>
+
+    <!-- 联系我们 -->
+    <view class="section">
+      <view class="section-title">
+        <text>联系我们</text>
+      </view>
+      <view class="contact-row">
+        <text class="contact-label">地址：</text>
+        <text>{{ shopInfo.address || '敬请期待' }}</text>
+      </view>
+      <view class="contact-row">
+        <text class="contact-label">电话：</text>
+        <text @click="callPhone">{{ shopInfo.phone || '敬请期待' }}</text>
+      </view>
+      <view class="contact-row">
+        <text class="contact-label">营业时间：</text>
+        <text>{{ shopInfo.businessHours || '10:00-21:00' }}</text>
       </view>
     </view>
   </view>
 </template>
 
 <script setup>
-const services = [
-  { id: 1, name: '深层清洁护理', duration: 60, price: 198, image: '/static/service1.jpg' },
-  { id: 2, name: '补水保湿SPA', duration: 90, price: 298, image: '/static/service2.jpg' },
-  { id: 3, name: '肩颈放松理疗', duration: 45, price: 168, image: '/static/service3.jpg' },
-]
+import { ref, onMounted } from 'vue'
+import { request, TENANT_ID } from '@/utils/request.js'
 
-function goToAppointment() {
-  uni.switchTab({ url: '/pages/appointment/index' })
+const banners = ref([])
+const services = ref([])
+const envImages = ref([])
+const shopInfo = ref({})
+
+onMounted(async () => {
+  await loadData()
+})
+
+async function loadData() {
+  // 加载店铺信息
+  try {
+    const webRes = await request({ url: `/website/public/${TENANT_ID}` })
+    shopInfo.value = webRes || {}
+    if (typeof webRes.banners === 'string') {
+      banners.value = JSON.parse(webRes.banners)
+    } else {
+      banners.value = webRes.banners || []
+    }
+    if (banners.value.length === 0) {
+      banners.value = [{ title: webRes.title || '欢迎光临', subtitle: webRes.subtitle || '' }]
+    }
+    if (typeof webRes.environmentImages === 'string') {
+      envImages.value = JSON.parse(webRes.environmentImages)
+    } else {
+      envImages.value = webRes.environmentImages || []
+    }
+  } catch (e) {
+    banners.value = [{ title: '欢迎光临', subtitle: '专业美业护理' }]
+  }
+
+  // 加载服务列表
+  try {
+    const serviceRes = await request({ url: `/website/public/${TENANT_ID}/services` })
+    services.value = serviceRes || []
+  } catch (e) {
+    console.log('加载服务失败', e)
+  }
+}
+
+function goTab(url) {
+  uni.switchTab({ url })
+}
+
+function goPage(url) {
+  uni.navigateTo({ url })
+}
+
+function showTip(msg) {
+  uni.showToast({ title: msg, icon: 'none' })
+}
+
+function callPhone() {
+  if (shopInfo.value.phone) {
+    uni.makePhoneCall({ phoneNumber: shopInfo.value.phone })
+  }
 }
 </script>
 
 <style scoped>
 .container {
-  padding-bottom: 20rpx;
+  padding-bottom: 30rpx;
+  background: #f5f5f5;
+  min-height: 100vh;
 }
 
-.banner {
-  height: 300rpx;
+.banner-swiper {
+  height: 400rpx;
+  width: 100%;
+}
+
+.banner-img {
+  width: 100%;
+  height: 100%;
+}
+
+.banner-placeholder {
+  width: 100%;
+  height: 100%;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   display: flex;
+  flex-direction: column;
   align-items: center;
-  padding: 0 40rpx;
-}
-
-.banner-content {
+  justify-content: center;
   color: #fff;
 }
 
-.shop-name {
-  font-size: 40rpx;
+.banner-title {
+  font-size: 44rpx;
   font-weight: 600;
-  margin-bottom: 10rpx;
+  margin-bottom: 16rpx;
 }
 
-.shop-desc {
+.banner-sub {
   font-size: 26rpx;
   opacity: 0.9;
 }
@@ -97,6 +201,8 @@ function goToAppointment() {
   border-radius: 16rpx;
   padding: 30rpx 0;
   box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+  position: relative;
+  z-index: 10;
 }
 
 .entry-item {
@@ -108,13 +214,13 @@ function goToAppointment() {
 }
 
 .entry-icon {
-  width: 80rpx;
-  height: 80rpx;
+  width: 88rpx;
+  height: 88rpx;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 36rpx;
+  font-size: 40rpx;
   margin-bottom: 12rpx;
 }
 
@@ -122,36 +228,49 @@ function goToAppointment() {
   background: #fff;
   margin: 20rpx;
   border-radius: 16rpx;
-  padding: 20rpx;
+  padding: 30rpx;
 }
 
 .section-title {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   font-size: 32rpx;
   font-weight: 600;
-  margin-bottom: 20rpx;
+  margin-bottom: 24rpx;
+  color: #333;
 }
 
 .more {
   font-size: 24rpx;
   color: #999;
   font-weight: normal;
+  float: right;
+}
+
+.about-text {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.8;
+}
+
+.service-list {
+  display: flex;
+  flex-direction: column;
 }
 
 .service-item {
   display: flex;
-  align-items: center;
-  padding: 20rpx 0;
+  padding: 24rpx 0;
   border-bottom: 1rpx solid #f5f5f5;
 }
 
-.service-img {
-  width: 120rpx;
-  height: 120rpx;
+.service-img-placeholder {
+  width: 140rpx;
+  height: 140rpx;
   border-radius: 12rpx;
-  background: #f5f5f5;
+  background: linear-gradient(135deg, #f5f7fa, #e4e7ed);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 60rpx;
   margin-right: 20rpx;
 }
 
@@ -161,14 +280,20 @@ function goToAppointment() {
 
 .service-name {
   font-size: 28rpx;
-  font-weight: 500;
+  font-weight: 600;
   margin-bottom: 8rpx;
 }
 
-.service-duration {
+.service-desc {
   font-size: 24rpx;
   color: #999;
-  margin-bottom: 8rpx;
+  margin-bottom: 12rpx;
+}
+
+.service-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .service-price {
@@ -177,11 +302,32 @@ function goToAppointment() {
   font-weight: 600;
 }
 
-.service-btn {
-  background: #667eea;
-  color: #fff;
-  padding: 12rpx 30rpx;
-  border-radius: 30rpx;
+.service-duration {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.env-scroll {
+  white-space: nowrap;
+}
+
+.env-img {
+  width: 200rpx;
+  height: 150rpx;
+  border-radius: 12rpx;
+  margin-right: 16rpx;
+  display: inline-block;
+}
+
+.contact-row {
+  display: flex;
+  padding: 12rpx 0;
   font-size: 26rpx;
+  color: #666;
+}
+
+.contact-label {
+  width: 140rpx;
+  color: #999;
 }
 </style>

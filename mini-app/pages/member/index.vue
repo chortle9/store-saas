@@ -1,247 +1,276 @@
 <template>
   <view class="container">
-    <!-- 会员信息卡片 -->
+    <!-- 会员卡片 -->
     <view class="member-card">
-      <view class="member-header">
-        <view class="avatar">小</view>
-        <view class="member-info">
-          <view class="name">小美同学</view>
-          <view class="level">黄金会员</view>
-        </view>
-      </view>
-      <view class="member-stats">
-        <view class="stat-item">
-          <view class="num">280</view>
-          <view class="label">积分</view>
-        </view>
-        <view class="stat-item">
-          <view class="num">¥520</view>
-          <view class="label">余额</view>
-        </view>
-        <view class="stat-item">
-          <view class="num">6次</view>
-          <view class="label">剩余次数</view>
-        </view>
+      <view class="card-bg"></view>
+      <view class="card-content">
+        <view class="member-name">{{ memberInfo.name || '尊贵会员' }}</view>
+        <view class="member-level">{{ memberInfo.level || '普通会员' }}</view>
+        <view class="card-number">**** **** **** 8888</view>
       </view>
     </view>
 
-    <!-- 我的卡包 -->
-    <view class="section">
-      <view class="section-title">我的卡包</view>
-      <view class="card-item">
-        <view class="card-name">10次护理卡</view>
-        <view class="card-remain">剩余 6 次</view>
-        <view class="card-expire">有效期至 2026-12-31</view>
+    <!-- 数据统计 -->
+    <view class="stats-row">
+      <view class="stat-item">
+        <view class="stat-num">{{ memberInfo.balance || 0 }}</view>
+        <view class="stat-label">账户余额</view>
       </view>
-      <view class="card-item">
-        <view class="card-name">储值卡 ¥1000</view>
-        <view class="card-remain">余额 ¥520</view>
-        <view class="card-expire">永久有效</view>
+      <view class="stat-item">
+        <view class="stat-num">{{ memberInfo.points || 0 }}</view>
+        <view class="stat-label">可用积分</view>
       </view>
-    </view>
-
-    <!-- 我的优惠券 -->
-    <view class="section">
-      <view class="section-title">优惠券</view>
-      <view class="coupon-item">
-        <view class="coupon-value">¥30</view>
-        <view class="coupon-info">
-          <view class="coupon-name">满200减30</view>
-          <view class="coupon-expire">有效期至 2026-10-31</view>
-        </view>
-        <view class="coupon-btn">去使用</view>
-      </view>
-      <view class="coupon-item">
-        <view class="coupon-value">8.5折</view>
-        <view class="coupon-info">
-          <view class="coupon-name">美容项目通用</view>
-          <view class="coupon-expire">有效期至 2026-11-15</view>
-        </view>
-        <view class="coupon-btn">去使用</view>
+      <view class="stat-item">
+        <view class="stat-num">{{ memberInfo.coupons || 0 }}</view>
+        <view class="stat-label">优惠券</view>
       </view>
     </view>
 
-    <!-- 消费记录 -->
+    <!-- 充值入口 -->
     <view class="section">
-      <view class="section-title">消费记录</view>
-      <view class="record-item">
-        <view class="record-name">深层清洁护理</view>
-        <view class="record-date">2026-10-10</view>
-        <view class="record-amount">-¥198</view>
+      <view class="section-title">余额充值</view>
+      <view class="recharge-grid">
+        <view
+          v-for="item in rechargeOptions"
+          :key="item.amount"
+          class="recharge-item"
+          :class="{ selected: selectedRecharge === item.amount }"
+          @click="selectedRecharge = item.amount"
+        >
+          <view class="amount">¥{{ item.amount }}</view>
+          <view class="gift" v-if="item.gift">送¥{{ item.gift }}</view>
+        </view>
       </view>
-      <view class="record-item">
-        <view class="record-name">补水保湿SPA</view>
-        <view class="record-date">2026-10-05</view>
-        <view class="record-amount">-¥298</view>
+      <button class="recharge-btn" @click="doRecharge">立即充值</button>
+    </view>
+
+    <!-- 我的卡项 -->
+    <view class="section">
+      <view class="section-title">我的卡项</view>
+      <view class="card-list">
+        <view class="card-item" v-for="card in myCards" :key="card.id">
+          <view class="card-icon">💳</view>
+          <view class="card-info">
+            <view class="card-name">{{ card.name }}</view>
+            <view class="card-desc">剩余 {{ card.remaining || 0 }} 次</view>
+          </view>
+          <view class="card-status">可用</view>
+        </view>
+        <view v-if="myCards.length === 0" class="empty-tip">
+          暂无卡项
+        </view>
       </view>
     </view>
   </view>
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
+import { request } from '@/utils/request.js'
+
+const memberInfo = ref({})
+const myCards = ref([])
+const selectedRecharge = ref(500)
+
+const rechargeOptions = [
+  { amount: 100, gift: 0 },
+  { amount: 500, gift: 50 },
+  { amount: 1000, gift: 150 },
+  { amount: 2000, gift: 400 },
+  { amount: 5000, gift: 1200 },
+]
+
+onMounted(() => {
+  loadData()
+})
+
+async function loadData() {
+  // 模拟会员数据，实际应从登录态获取
+  memberInfo.value = {
+    name: '张女士',
+    level: '金卡会员',
+    balance: 1280,
+    points: 560,
+    coupons: 3,
+  }
+  myCards.value = [
+    { id: 1, name: '面部护理10次卡', remaining: 6 },
+    { id: 2, name: '全身SPA5次卡', remaining: 2 },
+  ]
+}
+
+function doRecharge() {
+  uni.showToast({ title: '充值功能开发中', icon: 'none' })
+}
 </script>
 
 <style scoped>
 .container {
-  padding: 20rpx;
+  padding-bottom: 30rpx;
+  background: #f5f5f5;
+  min-height: 100vh;
 }
 
 .member-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  height: 300rpx;
+  margin: 20rpx;
   border-radius: 16rpx;
-  padding: 40rpx 30rpx;
+  overflow: hidden;
+  position: relative;
+}
+
+.card-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%);
+}
+
+.card-content {
+  position: relative;
+  padding: 40rpx;
   color: #fff;
-  margin-bottom: 20rpx;
 }
 
-.member-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 30rpx;
-}
-
-.avatar {
-  width: 100rpx;
-  height: 100rpx;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 44rpx;
-  margin-right: 20rpx;
-}
-
-.name {
+.member-name {
   font-size: 36rpx;
   font-weight: 600;
-  margin-bottom: 8rpx;
+  margin-bottom: 12rpx;
 }
 
-.level {
+.member-level {
   font-size: 24rpx;
   opacity: 0.9;
+  margin-bottom: 40rpx;
 }
 
-.member-stats {
+.card-number {
+  font-size: 28rpx;
+  letter-spacing: 4rpx;
+  opacity: 0.8;
+}
+
+.stats-row {
   display: flex;
-  justify-content: space-around;
+  background: #fff;
+  margin: 0 20rpx 20rpx;
+  border-radius: 16rpx;
+  padding: 30rpx 0;
 }
 
 .stat-item {
+  flex: 1;
   text-align: center;
 }
 
-.num {
+.stat-num {
   font-size: 36rpx;
   font-weight: 600;
+  color: #333;
   margin-bottom: 8rpx;
 }
 
-.label {
+.stat-label {
   font-size: 24rpx;
-  opacity: 0.8;
+  color: #999;
 }
 
 .section {
   background: #fff;
+  margin: 20rpx;
   border-radius: 16rpx;
   padding: 30rpx;
-  margin-bottom: 20rpx;
 }
 
 .section-title {
   font-size: 30rpx;
   font-weight: 600;
-  margin-bottom: 20rpx;
+  margin-bottom: 24rpx;
+}
+
+.recharge-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16rpx;
+  margin-bottom: 24rpx;
+}
+
+.recharge-item {
+  padding: 24rpx;
+  text-align: center;
+  border: 2rpx solid #f0f0f0;
+  border-radius: 12rpx;
+}
+
+.recharge-item.selected {
+  border-color: #667eea;
+  background: #f5f7ff;
+}
+
+.amount {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.gift {
+  font-size: 22rpx;
+  color: #f5576c;
+}
+
+.recharge-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+  border: none;
+  border-radius: 40rpx;
+  padding: 20rpx;
+  font-size: 30rpx;
+}
+
+.card-list {
+  display: flex;
+  flex-direction: column;
 }
 
 .card-item {
-  background: #f8f9ff;
-  border-left: 8rpx solid #667eea;
-  border-radius: 8rpx;
-  padding: 20rpx;
+  display: flex;
+  align-items: center;
+  padding: 24rpx;
+  background: #f9f9f9;
+  border-radius: 12rpx;
   margin-bottom: 16rpx;
+}
+
+.card-icon {
+  font-size: 48rpx;
+  margin-right: 20rpx;
+}
+
+.card-info {
+  flex: 1;
 }
 
 .card-name {
   font-size: 28rpx;
   font-weight: 500;
-  margin-bottom: 8rpx;
-}
-
-.card-remain {
-  font-size: 26rpx;
-  color: #667eea;
-  margin-bottom: 4rpx;
-}
-
-.card-expire {
-  font-size: 22rpx;
-  color: #999;
-}
-
-.coupon-item {
-  display: flex;
-  align-items: center;
-  padding: 20rpx;
-  background: #fff5f5;
-  border-radius: 8rpx;
-  margin-bottom: 16rpx;
-}
-
-.coupon-value {
-  font-size: 36rpx;
-  font-weight: 600;
-  color: #f5576c;
-  margin-right: 20rpx;
-  min-width: 100rpx;
-}
-
-.coupon-info {
-  flex: 1;
-}
-
-.coupon-name {
-  font-size: 26rpx;
   margin-bottom: 6rpx;
 }
 
-.coupon-expire {
-  font-size: 22rpx;
-  color: #999;
-}
-
-.coupon-btn {
-  background: #f5576c;
-  color: #fff;
-  padding: 10rpx 24rpx;
-  border-radius: 30rpx;
-  font-size: 24rpx;
-}
-
-.record-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20rpx 0;
-  border-bottom: 1rpx solid #f5f5f5;
-}
-
-.record-name {
-  font-size: 28rpx;
-  flex: 1;
-}
-
-.record-date {
+.card-desc {
   font-size: 24rpx;
   color: #999;
-  margin-right: 20rpx;
 }
 
-.record-amount {
-  font-size: 28rpx;
-  color: #f5576c;
-  font-weight: 500;
+.card-status {
+  font-size: 24rpx;
+  color: #67c23a;
+}
+
+.empty-tip {
+  text-align: center;
+  color: #999;
+  padding: 40rpx 0;
+  font-size: 26rpx;
 }
 </style>

@@ -8,8 +8,14 @@ export class Appointment {
   @Column({ comment: '所属租户ID' })
   tenantId: number;
 
-  @Column({ comment: '会员ID' })
+  @Column({ nullable: true, comment: '会员ID' })
   memberId: number;
+
+  @Column({ comment: '会员姓名' })
+  memberName: string;
+
+  @Column({ nullable: true, comment: '会员电话' })
+  memberPhone: string;
 
   @Column({ comment: '服务项目ID' })
   serviceId: number;

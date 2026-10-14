@@ -20,7 +20,7 @@ export class TenantWebsite {
   @Column({ type: 'text', nullable: true, comment: '关于我们小标题' })
   aboutTitle: string;
 
-  @Column({ type: 'simple-json', nullable: true, comment: '轮播图数组 [{image, title, subtitle}]' })
+  @Column({ type: 'longtext', nullable: true, comment: '轮播图数组 [{image, title, subtitle}]' })
   banners: string;
 
   @Column({ nullable: true, comment: '店铺地址' })
@@ -32,10 +32,10 @@ export class TenantWebsite {
   @Column({ nullable: true, comment: '营业时间' })
   businessHours: string;
 
-  @Column({ type: 'simple-json', nullable: true, comment: '环境展示图片数组' })
+  @Column({ type: 'longtext', nullable: true, comment: '环境展示图片数组' })
   environmentImages: string;
 
-  @Column({ type: 'simple-json', nullable: true, comment: '客户评价 [{name, content, avatar}]' })
+  @Column({ type: 'longtext', nullable: true, comment: '客户评价 [{name, content, avatar}]' })
   testimonials: string;
 
   @Column({ default: '#1a1a2e', comment: '主色调' })

@@ -63,7 +63,13 @@ export class AppointmentService {
    * 创建预约
    */
   async create(tenantId: number, data: Partial<Appointment>) {
-    const appointment = this.appointmentRepo.create({ ...data, tenantId });
+    // 处理默认值
+    if (!data.duration) data.duration = 60
+    if (!data.status) data.status = 'pending'
+    if (typeof data.appointmentTime === 'string') {
+      data.appointmentTime = new Date(data.appointmentTime)
+    }
+    const appointment = this.appointmentRepo.create({ ...data, tenantId })
     return this.appointmentRepo.save(appointment);
   }
 

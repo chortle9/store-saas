@@ -1,6 +1,7 @@
-import { Controller, Get, Put, Body, Req, Param } from '@nestjs/common';
+import { Controller, Get, Put, Post, Body, Req, Param } from '@nestjs/common';
 import { WebsiteService } from './website.service';
 import { ServiceItemService } from '../service/service-item.service';
+import { AppointmentService } from '../appointment/appointment.service';
 import { Public } from '../../common/guards/public.decorator';
 
 @Controller('website')
@@ -8,6 +9,7 @@ export class WebsiteController {
   constructor(
     private websiteService: WebsiteService,
     private serviceItemService: ServiceItemService,
+    private appointmentService: AppointmentService,
   ) {}
 
   // 店铺后台：获取/编辑自己的网站配置（全局守卫自动拦截）
@@ -33,5 +35,12 @@ export class WebsiteController {
   @Get('public/:tenantId/services')
   getPublicServices(@Param('tenantId') tenantId: string) {
     return this.serviceItemService.findByTenant(+tenantId);
+  }
+
+  // 公开接口：小程序提交预约
+  @Public()
+  @Post('public/:tenantId/appointments')
+  createPublicAppointment(@Param('tenantId') tenantId: string, @Body() body) {
+    return this.appointmentService.create(+tenantId, body);
   }
 }

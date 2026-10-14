@@ -1,112 +1,171 @@
 <template>
-  <div class="official-site" :style="{ '--primary': website.primaryColor || '#1a1a2e', '--accent': website.accentColor || '#c9a96e' }">
-    <!-- 顶部导航 -->
-    <header class="site-header" id="header">
-      <div class="container header-inner">
-        <div class="brand">
-          <span class="brand-name">{{ website.title || '优雅美学' }}</span>
+  <div class="sysu-site">
+    <!-- 主导航（吸顶） -->
+    <header class="main-header" :class="{ scrolled: isScrolled }">
+      <div class="container">
+        <div class="header-inner">
+          <div class="logo-area">
+            <div class="logo-circle">优</div>
+            <div class="logo-text">
+              <h1>{{ website.title || '优雅美学' }}</h1>
+              <p>ELEGANT BEAUTY CLUB</p>
+            </div>
+          </div>
+          <nav class="main-nav">
+            <a href="#home" class="active">首页</a>
+            <a href="#news">店铺动态</a>
+            <a href="#about">关于我们 <span class="arrow">▾</span></a>
+            <a href="#services">服务项目 <span class="arrow">▾</span></a>
+            <a href="#team">专业团队</a>
+            <a href="#env">门店环境</a>
+            <a href="#contact">联系我们</a>
+          </nav>
         </div>
-        <nav class="main-nav">
-          <a href="#home" class="nav-link active">首页</a>
-          <a href="#about" class="nav-link">关于我们</a>
-          <a href="#services" class="nav-link">服务项目</a>
-          <a href="#environment" class="nav-link">门店环境</a>
-          <a href="#contact" class="nav-link">联系我们</a>
-        </nav>
-        <button class="header-cta" @click="scrollToBooking">预约到店</button>
       </div>
     </header>
 
-    <!-- 首屏Banner -->
-    <section id="home" class="hero">
-      <div class="hero-slides">
-        <div
-          v-for="(banner, index) in banners"
-          :key="index"
-          class="hero-slide"
-          :class="{ active: currentSlide === index }"
-          :style="banner.image ? { backgroundImage: `url(${banner.image})` } : {}"
-        >
-          <div class="hero-overlay"></div>
-          <div class="hero-content container">
-            <h1 class="hero-title">{{ banner.title || website.title }}</h1>
-            <p class="hero-subtitle">{{ banner.subtitle || website.subtitle }}</p>
-          </div>
+    <!-- 全屏轮播Banner -->
+    <section id="home" class="hero-slider">
+      <div
+        v-for="(banner, index) in banners"
+        :key="index"
+        class="hero-slide"
+        :class="{ active: currentBanner === index }"
+        :style="banner.image ? { backgroundImage: `url(${banner.image})` } : {}"
+      >
+        <div class="hero-overlay"></div>
+        <div class="hero-content container">
+          <h2 class="hero-title">{{ banner.title || website.title }}</h2>
+          <p class="hero-sub">{{ banner.subtitle || website.subtitle }}</p>
         </div>
       </div>
-      <!-- 轮播指示器 -->
+
+      <!-- 向下箭头 -->
+      <div class="scroll-down" @click="scrollToNext">
+        <span class="arrow-down">⌄</span>
+      </div>
+
+      <!-- 底部轮播指示器 -->
       <div class="hero-dots">
         <span
           v-for="(banner, index) in banners"
           :key="index"
-          class="dot"
-          :class="{ active: currentSlide === index }"
-          @click="currentSlide = index"
+          class="dot-line"
+          :class="{ active: currentBanner === index }"
+          @click="currentBanner = index"
         ></span>
       </div>
     </section>
 
-    <!-- 服务项目 -->
-    <section id="services" class="section services-section">
+    <!-- 店铺动态（类似中大新闻） -->
+    <section id="news" class="news-section" :ref="addToRefs">
       <div class="container">
-        <div class="section-head">
-          <span class="section-sub">OUR SERVICES</span>
-          <h2 class="section-title">精选服务</h2>
-          <div class="section-line"></div>
+        <div class="section-header">
+          <h2>店铺动态</h2>
+          <a href="#" class="more-link">查看更多 →</a>
         </div>
-        <div class="services-grid">
-          <div class="service-item" v-for="(service, index) in services" :key="service.id">
-            <div class="service-num">0{{ index + 1 }}</div>
-            <h3 class="service-name">{{ service.name }}</h3>
-            <p class="service-desc">{{ service.description || '专业技师一对一服务，打造专属美丽方案' }}</p>
-            <div class="service-bottom">
-              <span class="service-price">¥{{ service.price }}</span>
-              <span class="service-link" @click="scrollToBooking">立即预约 →</span>
+
+        <!-- 主新闻：左图右文 -->
+        <div class="main-news">
+          <div class="news-img">
+            <img v-if="featuredNews.image" :src="featuredNews.image" />
+            <div v-else class="img-placeholder">店铺活动</div>
+          </div>
+          <div class="news-info">
+            <div class="news-date">{{ featuredNews.date }}</div>
+            <h3>{{ featuredNews.title }}</h3>
+            <p class="news-desc">{{ featuredNews.desc }}</p>
+            <div class="news-nav">
+              <button class="nav-btn" @click="prevNews">‹</button>
+              <button class="nav-btn" @click="nextNews">›</button>
+              <span class="news-count">{{ currentNewsIndex + 1 }}/{{ newsList.length }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 下面三张小新闻卡片 -->
+        <div class="sub-news-grid">
+          <div class="sub-news-card" v-for="(item, index) in subNews" :key="index">
+            <div class="sub-img">
+              <img v-if="item.image" :src="item.image" />
+              <div v-else class="img-placeholder-mini">缩略图</div>
+            </div>
+            <div class="sub-info">
+              <div class="sub-date">{{ item.date }}</div>
+              <h4>{{ item.title }}</h4>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 关于我们 -->
-    <section id="about" class="section about-section">
+    <!-- 数说店铺（类似数说中大） -->
+    <section class="stats-section" :ref="addToRefs">
+      <div class="stats-bg"></div>
+      <div class="stats-overlay"></div>
+      <div class="container relative">
+        <h2 class="stats-title">数说我们</h2>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-num">{{ stats.years }}</div>
+            <div class="stat-label">年行业经验</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">{{ stats.staff }}</div>
+            <div class="stat-label">专业技师</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">{{ stats.customers }}</div>
+            <div class="stat-label">服务客户</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">{{ stats.satisfaction }}</div>
+            <div class="stat-label">% 满意度</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">{{ stats.projects }}</div>
+            <div class="stat-label">服务项目</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">{{ stats.awards }}</div>
+            <div class="stat-label">行业奖项</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 服务项目（类似校园看点） -->
+    <section id="services" class="services-section" :ref="addToRefs">
       <div class="container">
-        <div class="about-grid">
-          <div class="about-text-col">
-            <span class="section-sub">ABOUT US</span>
-            <h2 class="section-title">{{ website.aboutTitle || '关于我们' }}</h2>
-            <div class="section-line left"></div>
-            <p class="about-desc">{{ website.aboutUs || '我们致力于为每一位顾客提供专业、细致、尊贵的美肤体验。多年行业深耕，用匠心与专业，守护每一份对美的追求。' }}</p>
-            <div class="about-stats">
-              <div class="stat">
-                <div class="stat-num">12<span>年</span></div>
-                <div class="stat-label">行业经验</div>
-              </div>
-              <div class="stat">
-                <div class="stat-num">8000<span>+</span></div>
-                <div class="stat-label">服务客户</div>
-              </div>
-              <div class="stat">
-                <div class="stat-num">99<span>%</span></div>
-                <div class="stat-label">好评率</div>
+        <div class="section-header">
+          <h2>精选服务</h2>
+          <a href="#" class="more-link">查看更多 →</a>
+        </div>
+        <div class="services-grid">
+          <div class="service-card" v-for="(service, index) in services.slice(0, 3)" :key="service.id">
+            <div class="service-img">
+              <div class="img-placeholder-service">服务图</div>
+            </div>
+            <div class="service-info">
+              <div class="service-tag">热门推荐</div>
+              <h3>{{ service.name }}</h3>
+              <p>{{ service.description || '专业技师一对一服务，让您享受舒适体验' }}</p>
+              <div class="service-footer">
+                <span class="price">¥{{ service.price }}</span>
+                <span class="duration">{{ service.duration || '60分钟' }}</span>
               </div>
             </div>
-          </div>
-          <div class="about-image-col">
-            <div class="about-img-main"></div>
-            <div class="about-img-small"></div>
           </div>
         </div>
       </div>
     </section>
 
     <!-- 门店环境 -->
-    <section id="environment" class="section env-section">
+    <section id="env" class="env-section" :ref="addToRefs">
       <div class="container">
-        <div class="section-head">
-          <span class="section-sub">ENVIRONMENT</span>
-          <h2 class="section-title">门店环境</h2>
-          <div class="section-line"></div>
+        <div class="section-header">
+          <h2>门店环境</h2>
+          <a href="#" class="more-link">查看更多 →</a>
         </div>
         <div class="env-grid">
           <div
@@ -114,68 +173,59 @@
             :key="index"
             class="env-item"
             :style="{ backgroundImage: `url(${img})` }"
-          ></div>
-          <!-- 占位图 -->
-          <div v-if="environmentImages.length === 0" class="env-item placeholder">
-            <span>等待上传环境图片</span>
+          >
+            <div class="env-overlay">
+              <span>环境展示 {{ index + 1 }}</span>
+            </div>
           </div>
-          <div v-if="environmentImages.length === 0" class="env-item placeholder">
-            <span>私密护理空间</span>
-          </div>
-          <div v-if="environmentImages.length === 0" class="env-item placeholder">
-            <span>休闲等候区</span>
-          </div>
-          <div v-if="environmentImages.length === 0" class="env-item placeholder">
-            <span>产品展示区</span>
-          </div>
+          <template v-if="environmentImages.length === 0">
+            <div class="env-item placeholder-img">接待大厅</div>
+            <div class="env-item placeholder-img">护理房间</div>
+            <div class="env-item placeholder-img">休息区域</div>
+          </template>
         </div>
       </div>
     </section>
 
-    <!-- 客户评价 -->
-    <section v-if="testimonials.length > 0" class="section testimonial-section">
+    <!-- 关于我们 -->
+    <section id="about" class="about-section" :ref="addToRefs">
       <div class="container">
-        <div class="section-head">
-          <span class="section-sub">TESTIMONIALS</span>
-          <h2 class="section-title">客户评价</h2>
-          <div class="section-line"></div>
-        </div>
-        <div class="testimonial-grid">
-          <div v-for="(item, index) in testimonials" :key="index" class="testimonial-card">
-            <div class="quote-mark">"</div>
-            <p class="testimonial-content">{{ item.content }}</p>
-            <div class="testimonial-author">—— {{ item.name }}</div>
+        <div class="about-content">
+          <div class="about-text">
+            <h2>关于我们</h2>
+            <div class="divider"></div>
+            <p>{{ website.aboutUs || '我们是一家专注于美业的高端会所，拥有多年行业经验和专业技师团队。我们以顾客为中心，以专业为基础，致力于为每一位顾客提供最优质的服务体验。' }}</p>
+            <button class="learn-more">了解更多 →</button>
+          </div>
+          <div class="about-img">
+            <div class="big-placeholder">门店实景</div>
           </div>
         </div>
       </div>
     </section>
 
     <!-- 联系我们 + 预约 -->
-    <section id="contact" class="section contact-section">
+    <section id="contact" class="contact-section" :ref="addToRefs">
       <div class="container">
         <div class="contact-grid">
           <div class="contact-info">
-            <span class="section-sub">CONTACT</span>
-            <h2 class="section-title">联系我们</h2>
-            <div class="section-line left"></div>
-            <div class="contact-list">
-              <div class="contact-row">
-                <span class="contact-label">地址</span>
-                <span class="contact-value">{{ website.address || '请在后台设置门店地址' }}</span>
-              </div>
-              <div class="contact-row">
-                <span class="contact-label">电话</span>
-                <span class="contact-value">{{ website.phone || '请在后台设置联系电话' }}</span>
-              </div>
-              <div class="contact-row">
-                <span class="contact-label">营业时间</span>
-                <span class="contact-value">{{ website.businessHours || '周一至周日 10:00 - 21:00' }}</span>
-              </div>
+            <h2>联系我们</h2>
+            <div class="divider"></div>
+            <div class="info-row">
+              <label>📍 门店地址</label>
+              <span>{{ website.address || '敬请期待' }}</span>
+            </div>
+            <div class="info-row">
+              <label>📞 联系电话</label>
+              <span>{{ website.phone || '敬请期待' }}</span>
+            </div>
+            <div class="info-row">
+              <label>🕐 营业时间</label>
+              <span>{{ website.businessHours || '周一至周日 10:00 - 21:00' }}</span>
             </div>
           </div>
-          <div class="booking-form" id="booking">
-            <h3 class="form-title">在线预约</h3>
-            <p class="form-desc">留下您的信息，我们将尽快与您联系确认</p>
+          <div class="booking-box">
+            <h3>在线预约</h3>
             <div class="form-group">
               <input v-model="bookingForm.name" type="text" placeholder="您的称呼" />
             </div>
@@ -183,7 +233,7 @@
               <input v-model="bookingForm.phone" type="tel" placeholder="联系电话" />
             </div>
             <div class="form-group">
-              <textarea v-model="bookingForm.note" rows="3" placeholder="想体验的项目 / 其他需求（选填）"></textarea>
+              <textarea v-model="bookingForm.note" rows="3" placeholder="想体验的项目..."></textarea>
             </div>
             <button class="submit-btn" @click="submitBooking">提交预约</button>
           </div>
@@ -193,14 +243,11 @@
 
     <!-- 页脚 -->
     <footer class="site-footer">
-      <div class="container footer-inner">
-        <div class="footer-left">
+      <div class="container">
+        <div class="footer-inner">
           <div class="footer-brand">{{ website.title || '优雅美学' }}</div>
-          <p class="footer-desc">{{ website.subtitle || '专业美业 · 匠心服务' }}</p>
-        </div>
-        <div class="footer-right">
           <p>{{ website.copyright || `© 2026 ${website.title || '优雅美学'} 版权所有` }}</p>
-          <p class="footer-powered">Powered by 店小伴SaaS</p>
+          <p>Powered by 店小伴SaaS</p>
         </div>
       </div>
     </footer>
@@ -218,12 +265,72 @@ const tenantId = route.params.tenantId as string
 
 const website = ref<any>({})
 const services = ref<any[]>([])
-const banners = ref<any[]>([])
 const environmentImages = ref<string[]>([])
-const testimonials = ref<any[]>([])
+const banners = ref<any[]>([])
+const currentBanner = ref(0)
+let bannerTimer: any = null
 
-const currentSlide = ref(0)
-let slideTimer: any = null
+// 滚动入场动画
+const animatedSections = ref(new Set<number>())
+const sectionRefs = ref<HTMLElement[]>([])
+
+function addToRefs(el: any) {
+  if (el && !sectionRefs.value.includes(el)) {
+    sectionRefs.value.push(el)
+  }
+}
+
+function checkScroll() {
+  sectionRefs.value.forEach((el, index) => {
+    if (!el) return
+    const rect = el.getBoundingClientRect()
+    const isVisible = rect.top < window.innerHeight * 0.85
+    if (isVisible && !animatedSections.value.has(index)) {
+      animatedSections.value.add(index)
+      el.classList.add('animate-in')
+    }
+  })
+}
+
+// 新闻轮播
+const currentNewsIndex = ref(0)
+const newsList = ref([
+  {
+    date: '2026/10/01',
+    title: '国庆感恩回馈，全场项目8折起',
+    desc: '为庆祝国庆佳节，本店特推出感恩回馈活动，全场护理项目8折起，会员享额外9折优惠。活动时间10月1日-10月7日，欢迎预约体验。',
+    image: '',
+  },
+  {
+    date: '2026/09/15',
+    title: '秋季护肤新品上市，多重好礼等您拿',
+    desc: '秋季是护肤的黄金季节，我们引进了全新的秋季护理系列，针对秋季干燥敏感肌肤设计，购买套盒赠送精美礼品一份。',
+    image: '',
+  },
+  {
+    date: '2026/09/01',
+    title: '教师节专属福利，教师凭证享7折优惠',
+    desc: '感恩教师，桃李芬芳。9月整月，持教师证到店消费，所有项目享7折优惠，还赠送专业肌肤检测一次。',
+    image: '',
+  },
+])
+
+const featuredNews = ref(newsList.value[0])
+
+const subNews = ref([
+  { date: '2026/10/10', title: '储值充值优惠，充1000送200', image: '' },
+  { date: '2026/10/08', title: '新客体验价，首次到店立减100元', image: '' },
+  { date: '2026/10/01', title: '闺蜜同行，第二人半价', image: '' },
+])
+
+const stats = ref({
+  years: 10,
+  staff: 15,
+  customers: 8000,
+  satisfaction: 99,
+  projects: 50,
+  awards: 8,
+})
 
 const bookingForm = ref({
   name: '',
@@ -231,42 +338,56 @@ const bookingForm = ref({
   note: '',
 })
 
+const isScrolled = ref(false)
+
 async function loadData() {
-  // 获取网站配置
   const webRes: any = await request.get(`/website/public/${tenantId}`)
   website.value = webRes || {}
 
-  // 解析轮播图
   if (typeof webRes?.banners === 'string') {
-    try { banners.value = JSON.parse(webRes.banners) } catch { banners.value = [] }
+    try { banners.value = JSON.parse(webRes.banners) } catch {}
   } else if (webRes?.banners) {
     banners.value = webRes.banners
   }
   if (!banners.value || banners.value.length === 0) {
-    banners.value = [{ image: '', title: webRes?.title || '遇见更美的自己', subtitle: webRes?.subtitle || '' }]
+    banners.value = [{ image: '', title: webRes?.title || '优雅美学空间', subtitle: webRes?.subtitle || 'ELEGANT BEAUTY CLUB' }]
   }
 
-  // 解析环境图
   if (typeof webRes?.environmentImages === 'string') {
-    try { environmentImages.value = JSON.parse(webRes.environmentImages) } catch { environmentImages.value = [] }
+    try { environmentImages.value = JSON.parse(webRes.environmentImages) } catch {}
   } else if (webRes?.environmentImages) {
     environmentImages.value = webRes.environmentImages
   }
 
-  // 解析评价
-  if (typeof webRes?.testimonials === 'string') {
-    try { testimonials.value = JSON.parse(webRes.testimonials) } catch { testimonials.value = [] }
-  } else if (webRes?.testimonials) {
-    testimonials.value = webRes.testimonials
-  }
-
-  // 获取服务项目
   const serviceRes: any = await request.get(`/website/public/${tenantId}/services`)
   services.value = serviceRes || []
+
+  startBannerTimer()
 }
 
-function scrollToBooking() {
-  document.getElementById('booking')?.scrollIntoView({ behavior: 'smooth' })
+function startBannerTimer() {
+  if (banners.value.length <= 1) return
+  bannerTimer = setInterval(() => {
+    currentBanner.value = (currentBanner.value + 1) % banners.value.length
+  }, 5000)
+}
+
+function prevNews() {
+  currentNewsIndex.value = (currentNewsIndex.value - 1 + newsList.value.length) % newsList.value.length
+  featuredNews.value = newsList.value[currentNewsIndex.value]
+}
+
+function nextNews() {
+  currentNewsIndex.value = (currentNewsIndex.value + 1) % newsList.value.length
+  featuredNews.value = newsList.value[currentNewsIndex.value]
+}
+
+function scrollToNext() {
+  document.getElementById('news')?.scrollIntoView({ behavior: 'smooth' })
+}
+
+function handleScroll() {
+  isScrolled.value = window.scrollY > 100
 }
 
 function submitBooking() {
@@ -274,24 +395,22 @@ function submitBooking() {
     ElMessage.warning('请填写称呼和联系电话')
     return
   }
-  ElMessage.success('预约提交成功！我们将尽快与您联系')
+  ElMessage.success('预约提交成功！')
   bookingForm.value = { name: '', phone: '', note: '' }
-}
-
-// 轮播自动切换
-function startSlideTimer() {
-  slideTimer = setInterval(() => {
-    currentSlide.value = (currentSlide.value + 1) % banners.value.length
-  }, 5000)
 }
 
 onMounted(() => {
   loadData()
-  setTimeout(startSlideTimer, 1000)
+  window.addEventListener('scroll', handleScroll)
+  window.addEventListener('scroll', checkScroll)
+  // 初始检查一次
+  setTimeout(checkScroll, 100)
 })
 
 onUnmounted(() => {
-  if (slideTimer) clearInterval(slideTimer)
+  if (bannerTimer) clearInterval(bannerTimer)
+  window.removeEventListener('scroll', handleScroll)
+  window.removeEventListener('scroll', checkScroll)
 })
 </script>
 
@@ -302,93 +421,120 @@ onUnmounted(() => {
   box-sizing: border-box;
 }
 
-.official-site {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+.sysu-site {
+  font-family: "Microsoft YaHei", "PingFang SC", "Helvetica Neue", sans-serif;
   color: #333;
-  background: #fff;
+  --primary: #006633;
+  --primary-dark: #004d26;
+  --accent: #c9a96e;
 }
 
 .container {
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 0 40px;
 }
 
-/* 头部导航 */
-.site-header {
-  position: fixed;
+.relative {
+  position: relative;
+  z-index: 2;
+}
+
+/* 主导航 */
+.main-header {
+  background: white;
+  padding: 16px 0;
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
   z-index: 100;
-  background: rgba(255,255,255,0.98);
-  box-shadow: 0 1px 0 rgba(0,0,0,0.05);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  transition: all 0.3s;
+}
+
+.main-header.scrolled {
+  padding: 10px 0;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
 }
 
 .header-inner {
-  height: 80px;
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
 }
 
-.brand-name {
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.logo-circle {
+  width: 50px;
+  height: 50px;
+  border: 2px solid var(--primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
   font-size: 22px;
+  font-weight: bold;
+}
+
+.logo-text h1 {
+  font-size: 24px;
+  color: var(--primary);
   font-weight: 600;
   letter-spacing: 2px;
-  color: var(--primary);
+  line-height: 1.2;
+}
+
+.logo-text p {
+  font-size: 10px;
+  color: #999;
+  letter-spacing: 1px;
+  margin-top: 2px;
 }
 
 .main-nav {
   display: flex;
-  gap: 48px;
+  gap: 36px;
 }
 
-.nav-link {
+.main-nav a {
+  color: #333;
   text-decoration: none;
-  color: #666;
   font-size: 15px;
-  letter-spacing: 1px;
+  font-weight: 500;
   transition: color 0.2s;
+  padding: 8px 0;
   position: relative;
 }
 
-.nav-link:hover,
-.nav-link.active {
+.main-nav a:hover,
+.main-nav a.active {
   color: var(--primary);
 }
 
-.nav-link.active::after {
+.main-nav a.active::after {
   content: '';
   position: absolute;
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 20px;
+  bottom: 0;
+  left: 0;
+  right: 0;
   height: 2px;
-  background: var(--accent);
-}
-
-.header-cta {
-  padding: 10px 28px;
   background: var(--primary);
-  color: white;
-  border: none;
-  font-size: 14px;
-  letter-spacing: 1px;
-  cursor: pointer;
-  transition: opacity 0.2s;
 }
 
-.header-cta:hover {
-  opacity: 0.9;
+.arrow {
+  font-size: 10px;
+  margin-left: 2px;
 }
 
-/* Hero Banner */
-.hero {
-  margin-top: 80px;
-  height: 85vh;
+/* 全屏轮播Banner */
+.hero-slider {
   position: relative;
+  height: 500px;
   overflow: hidden;
 }
 
@@ -396,10 +542,12 @@ onUnmounted(() => {
   position: absolute;
   inset: 0;
   opacity: 0;
-  transition: opacity 0.8s ease;
+  transition: opacity 1s ease;
   background-size: cover;
   background-position: center;
-  background-color: var(--primary);
+  background: linear-gradient(135deg, #004d26 0%, #006633 50%, #008040 100%);
+  display: flex;
+  align-items: center;
 }
 
 .hero-slide.active {
@@ -414,226 +562,439 @@ onUnmounted(() => {
 
 .hero-content {
   position: relative;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  z-index: 2;
   color: white;
 }
 
 .hero-title {
-  font-size: 56px;
+  font-size: 42px;
   font-weight: 300;
   letter-spacing: 4px;
-  margin-bottom: 24px;
-  line-height: 1.2;
+  margin-bottom: 16px;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.2);
 }
 
-.hero-subtitle {
-  font-size: 20px;
-  font-weight: 300;
-  letter-spacing: 2px;
+.hero-sub {
+  font-size: 18px;
   opacity: 0.9;
+  letter-spacing: 2px;
+}
+
+.scroll-down {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  font-size: 28px;
+  cursor: pointer;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+  40% { transform: translateX(-50%) translateY(-10px); }
+  60% { transform: translateX(-50%) translateY(-5px); }
 }
 
 .hero-dots {
   position: absolute;
-  bottom: 40px;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: 30px;
+  right: 40px;
   display: flex;
-  gap: 12px;
-  z-index: 10;
+  gap: 8px;
 }
 
-.dot {
+.dot-line {
   width: 30px;
   height: 3px;
-  background: rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.3);
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.3s;
 }
 
-.dot.active {
+.dot-line.active {
   background: white;
+  width: 45px;
 }
 
-/* 通用Section */
-.section {
-  padding: 100px 0;
+/* Section通用 */
+section {
+  padding: 80px 0;
 }
 
-.section-head {
-  text-align: center;
-  margin-bottom: 60px;
+/* 滚动入场动画 */
+section {
+  opacity: 0;
+  transition: opacity 0.8s ease, transform 0.8s ease;
 }
 
-.section-sub {
-  display: block;
-  font-size: 12px;
-  letter-spacing: 3px;
-  color: var(--accent);
-  margin-bottom: 16px;
+/* 店铺动态：从左滑入 */
+.news-section {
+  transform: translateX(-80px);
 }
 
-.section-title {
-  font-size: 36px;
-  font-weight: 400;
-  letter-spacing: 3px;
-  color: var(--primary);
-  margin-bottom: 20px;
+.news-section.animate-in {
+  opacity: 1;
+  transform: translateX(0);
 }
 
-.section-line {
-  width: 40px;
-  height: 2px;
-  background: var(--accent);
-  margin: 0 auto;
+/* 数据统计：缩放进入 */
+.stats-section {
+  transform: scale(0.9);
 }
 
-.section-line.left {
-  margin: 0;
+.stats-section.animate-in {
+  opacity: 1;
+  transform: scale(1);
 }
 
-/* 服务项目 */
+/* 服务项目：从右滑入 */
 .services-section {
-  background: #fafafa;
+  transform: translateX(80px);
 }
 
-.services-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 40px;
+.services-section.animate-in {
+  opacity: 1;
+  transform: translateX(0);
 }
 
-.service-item {
-  background: white;
-  padding: 40px 32px;
-  transition: transform 0.3s, box-shadow 0.3s;
+/* 门店环境：从下滑入 */
+.env-section {
+  transform: translateY(80px);
 }
 
-.service-item:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+.env-section.animate-in {
+  opacity: 1;
+  transform: translateY(0);
 }
 
-.service-num {
+/* 关于我们：从下淡入 */
+.about-section {
+  transform: translateY(60px);
+  transition-delay: 0.1s;
+}
+
+.about-section.animate-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 联系我们：从右滑入 */
+.contact-section {
+  transform: translateX(60px);
+}
+
+.contact-section.animate-in {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+#home {
+  opacity: 1;
+  transform: none;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 40px;
+}
+
+.section-header h2 {
+  font-size: 32px;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.more-link {
   font-size: 14px;
-  color: var(--accent);
-  letter-spacing: 2px;
-  margin-bottom: 16px;
+  color: #999;
+  text-decoration: none;
+  transition: color 0.2s;
 }
 
-.service-name {
-  font-size: 20px;
-  font-weight: 500;
+.more-link:hover {
+  color: var(--primary);
+}
+
+/* 新闻板块 */
+.news-section {
+  background: #f5f5f3;
+  position: relative;
+}
+
+.main-news {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 30px;
+}
+
+.news-img {
+  height: 320px;
+  overflow: hidden;
+}
+
+.news-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.img-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #d4cfc7, #b8b0a4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+}
+
+.news-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.news-date {
+  font-size: 14px;
   color: var(--primary);
   margin-bottom: 12px;
-  letter-spacing: 1px;
+  font-weight: 500;
 }
 
-.service-desc {
+.news-info h3 {
+  font-size: 24px;
+  line-height: 1.5;
+  margin-bottom: 16px;
+  color: #333;
+}
+
+.news-desc {
   font-size: 14px;
   color: #888;
   line-height: 1.8;
   margin-bottom: 24px;
 }
 
-.service-bottom {
+.news-nav {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding-top: 20px;
-  border-top: 1px solid #f0f0f0;
+  gap: 12px;
 }
 
-.service-price {
-  font-size: 20px;
-  color: #c0392b;
+.nav-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
+  font-size: 18px;
+  transition: all 0.2s;
+}
+
+.nav-btn:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.news-count {
+  font-size: 24px;
+  color: var(--primary);
+  font-weight: 600;
+  margin-left: auto;
+}
+
+.sub-news-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.sub-news-card {
+  background: white;
+  padding: 16px;
+  display: flex;
+  gap: 16px;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.sub-news-card:hover {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+.sub-img {
+  width: 100px;
+  height: 70px;
+  flex-shrink: 0;
+}
+
+.img-placeholder-mini {
+  width: 100%;
+  height: 100%;
+  background: #e8e4de;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #aaa;
+  font-size: 11px;
+}
+
+.sub-info h4 {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #333;
+  margin-top: 4px;
+}
+
+.sub-date {
+  font-size: 12px;
+  color: var(--primary);
   font-weight: 500;
 }
 
-.service-link {
-  font-size: 14px;
-  color: var(--accent);
-  cursor: pointer;
-  transition: letter-spacing 0.2s;
+/* 数据统计 */
+.stats-section {
+  position: relative;
+  padding: 100px 0;
+  overflow: hidden;
 }
 
-.service-link:hover {
-  letter-spacing: 1px;
+.stats-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #004d26 0%, #006633 100%);
 }
 
-/* 关于我们 */
-.about-grid {
+.stats-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.2) 100%);
+}
+
+.stats-title {
+  text-align: center;
+  color: white;
+  font-size: 36px;
+  font-weight: 300;
+  margin-bottom: 60px;
+  letter-spacing: 4px;
+}
+
+.stats-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 80px;
-  align-items: center;
-}
-
-.about-desc {
-  font-size: 15px;
-  line-height: 2;
-  color: #666;
-  margin-bottom: 40px;
-}
-
-.about-stats {
-  display: flex;
-  gap: 60px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  text-align: center;
 }
 
 .stat-num {
-  font-size: 36px;
+  font-size: 56px;
+  color: white;
   font-weight: 300;
-  color: var(--primary);
-}
-
-.stat-num span {
-  font-size: 16px;
-  margin-left: 4px;
+  line-height: 1;
+  margin-bottom: 12px;
 }
 
 .stat-label {
-  font-size: 13px;
-  color: #999;
-  margin-top: 8px;
+  font-size: 14px;
+  color: rgba(255,255,255,0.8);
   letter-spacing: 1px;
 }
 
-.about-image-col {
-  position: relative;
-  height: 500px;
+/* 服务项目 */
+.services-section {
+  background: white;
 }
 
-.about-img-main {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 75%;
-  height: 80%;
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+.service-card {
+  background: white;
+  border: 1px solid #eee;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.service-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 8px 30px rgba(0,102,51,0.15);
+}
+
+.service-img {
+  height: 200px;
   background: linear-gradient(135deg, #e8e4de, #d4cfc7);
 }
 
-.about-img-small {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 50%;
-  height: 50%;
-  background: linear-gradient(135deg, #f0ebe4, #e0d8cd);
-  border: 8px solid white;
+.img-placeholder-service {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #aaa;
+}
+
+.service-info {
+  padding: 20px;
+}
+
+.service-tag {
+  display: inline-block;
+  background: #fff3e0;
+  color: #e65100;
+  font-size: 11px;
+  padding: 3px 8px;
+  margin-bottom: 10px;
+}
+
+.service-info h3 {
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.service-info p {
+  font-size: 13px;
+  color: #999;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.service-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.price {
+  font-size: 20px;
+  color: #c0392b;
+  font-weight: 600;
+}
+
+.duration {
+  font-size: 12px;
+  color: #999;
 }
 
 /* 门店环境 */
 .env-section {
-  background: #fafafa;
+  background: #f9f9f9;
 }
 
 .env-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
 }
 
@@ -641,111 +1002,145 @@ onUnmounted(() => {
   aspect-ratio: 4/3;
   background-size: cover;
   background-position: center;
+  position: relative;
+  overflow: hidden;
 }
 
-.env-item.placeholder {
+.env-item:hover .env-overlay {
+  opacity: 1;
+}
+
+.env-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,102,51,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.placeholder-img {
   background: #e8e4de;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #aaa;
-  font-size: 14px;
 }
 
-/* 客户评价 */
-.testimonial-grid {
+/* 关于我们 */
+.about-section {
+  background: white;
+}
+
+.about-content {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 32px;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
 }
 
-.testimonial-card {
-  padding: 40px 32px;
-  background: #fafafa;
+.about-text h2 {
+  font-size: 32px;
+  color: var(--primary);
+  margin-bottom: 16px;
 }
 
-.quote-mark {
-  font-size: 48px;
-  color: var(--accent);
-  line-height: 1;
-  margin-bottom: 20px;
-  font-family: Georgia, serif;
-}
-
-.testimonial-content {
-  font-size: 15px;
-  line-height: 1.9;
-  color: #666;
+.divider {
+  width: 40px;
+  height: 3px;
+  background: var(--accent);
   margin-bottom: 24px;
 }
 
-.testimonial-author {
-  font-size: 14px;
+.about-text p {
+  font-size: 15px;
+  line-height: 2;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.learn-more {
+  padding: 12px 32px;
+  background: transparent;
+  border: 2px solid var(--primary);
   color: var(--primary);
-  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.learn-more:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.big-placeholder {
+  height: 350px;
+  background: linear-gradient(135deg, #e8e4de, #d4cfc7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #aaa;
+  font-size: 18px;
 }
 
 /* 联系我们 */
+.contact-section {
+  background: #f5f5f3;
+}
+
 .contact-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 80px;
+  gap: 60px;
 }
 
-.contact-list {
-  margin-top: 40px;
+.contact-info h2 {
+  font-size: 28px;
+  color: var(--primary);
+  margin-bottom: 16px;
 }
 
-.contact-row {
+.info-row {
   display: flex;
-  padding: 20px 0;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.contact-label {
-  width: 80px;
-  color: #999;
-  font-size: 14px;
-}
-
-.contact-value {
-  color: #333;
+  padding: 16px 0;
+  border-bottom: 1px solid #e0e0e0;
   font-size: 15px;
 }
 
-.booking-form {
-  background: #fafafa;
-  padding: 48px;
-}
-
-.form-title {
-  font-size: 24px;
-  font-weight: 400;
-  color: var(--primary);
-  letter-spacing: 2px;
-  margin-bottom: 8px;
-}
-
-.form-desc {
-  font-size: 14px;
+.info-row label {
+  width: 100px;
   color: #999;
-  margin-bottom: 32px;
+}
+
+.booking-box {
+  background: white;
+  padding: 36px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.booking-box h3 {
+  font-size: 20px;
+  color: var(--primary);
+  margin-bottom: 24px;
 }
 
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .form-group input,
 .form-group textarea {
   width: 100%;
-  padding: 14px 16px;
-  border: 1px solid #e5e5e5;
-  background: white;
-  font-size: 14px;
+  padding: 12px 14px;
+  border: 1px solid #ddd;
   outline: none;
-  transition: border-color 0.2s;
+  font-size: 14px;
   font-family: inherit;
+  transition: border-color 0.2s;
 }
 
 .form-group input:focus,
@@ -755,53 +1150,36 @@ onUnmounted(() => {
 
 .submit-btn {
   width: 100%;
-  padding: 16px;
+  padding: 14px;
   background: var(--primary);
   color: white;
   border: none;
   font-size: 15px;
-  letter-spacing: 2px;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: background 0.2s;
 }
 
 .submit-btn:hover {
-  opacity: 0.9;
+  background: var(--primary-dark);
 }
 
 /* 页脚 */
 .site-footer {
-  background: var(--primary);
-  color: rgba(255,255,255,0.7);
+  background: #1a1a1a;
+  color: #888;
   padding: 40px 0;
-}
-
-.footer-inner {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  text-align: center;
+  font-size: 13px;
 }
 
 .footer-brand {
   font-size: 18px;
   color: white;
-  letter-spacing: 2px;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
-.footer-desc {
-  font-size: 13px;
-  opacity: 0.7;
-}
-
-.footer-right {
-  text-align: right;
-  font-size: 13px;
-}
-
-.footer-powered {
-  margin-top: 4px;
-  opacity: 0.5;
+.site-footer p {
+  margin: 6px 0;
 }
 
 /* 响应式 */
@@ -812,13 +1190,15 @@ onUnmounted(() => {
   .hero-title {
     font-size: 36px;
   }
-  .services-grid,
-  .testimonial-grid,
-  .env-grid {
+  .main-news,
+  .about-content,
+  .contact-grid {
     grid-template-columns: 1fr;
   }
-  .about-grid,
-  .contact-grid {
+  .sub-news-grid,
+  .services-grid,
+  .env-grid,
+  .stats-grid {
     grid-template-columns: 1fr;
   }
 }
