@@ -24,6 +24,19 @@ import { StockProduct } from './modules/stock/stock-product.entity';
 import { MarketingActivity } from './modules/marketing/marketing-activity.entity';
 import { TenantWebsite } from './modules/website/website.entity';
 import { OperationLog } from './modules/log/operation-log.entity';
+import { Payment } from './modules/payment/payment.entity';
+import { CommissionRecord } from './modules/commission/commission.entity';
+import { GroupBuyActivity } from './modules/marketing/group-buy.entity';
+import { GroupBuyOrder } from './modules/marketing/group-buy-order.entity';
+import { BargainActivity } from './modules/marketing/bargain.entity';
+import { BargainRecord } from './modules/marketing/bargain-record.entity';
+import { ReferralRecord } from './modules/marketing/referral.entity';
+import { AutoRule } from './modules/marketing/auto-rule.entity';
+import { StaffSchedule } from './modules/staff/schedule.entity';
+import { Store } from './modules/store/store.entity';
+import { MomentMaterial } from './modules/marketing/moment.entity';
+import { Product } from './modules/product/product.entity';
+import { ShiftRecord } from './modules/order/shift.entity';
 
 // 模块
 import { AuthModule } from './modules/auth/auth.module';
@@ -41,6 +54,10 @@ import { PlatformModule } from './modules/platform/platform.module';
 import { StockModule } from './modules/stock/stock.module';
 import { WebsiteModule } from './modules/website/website.module';
 import { ReportModule } from './modules/report/report.module';
+import { PaymentModule } from './modules/payment/payment.module';
+import { CommissionModule } from './modules/commission/commission.module';
+import { StoreModule } from './modules/store/store.module';
+import { ProductModule } from './modules/product/product.module';
 
 // 守卫
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
@@ -59,7 +76,10 @@ import { TenantGuard } from './common/guards/tenant.guard';
         Tenant, User, Member, Appointment, ServiceItem, Staff,
         Card, CardRecord, Order, OrderItem, Coupon, MemberCoupon, Notice,
         MemberLevel, PointsRecord, RechargeRecord, StockProduct,
-        MarketingActivity, TenantWebsite, OperationLog
+        MarketingActivity, TenantWebsite, OperationLog, Payment, CommissionRecord,
+        GroupBuyActivity, GroupBuyOrder, BargainActivity, BargainRecord,
+        ReferralRecord, AutoRule, StaffSchedule, Store,
+        MomentMaterial, Product, ShiftRecord
       ],
       synchronize: true, // 开发环境自动建表，生产环境请用迁移
       timezone: '+08:00',
@@ -79,6 +99,10 @@ import { TenantGuard } from './common/guards/tenant.guard';
     StockModule,
     WebsiteModule,
     ReportModule,
+    PaymentModule,
+    CommissionModule,
+    StoreModule,
+    ProductModule,
   ],
   providers: [
     JwtService,

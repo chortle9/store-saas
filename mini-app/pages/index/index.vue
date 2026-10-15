@@ -1,5 +1,24 @@
 <template>
   <view class="container">
+    <!-- 顶部会员欢迎条 -->
+    <view class="member-bar" v-if="isLogin">
+      <view class="member-left">
+        <text class="hello">早上好，张女士</text>
+        <text class="member-level">金卡会员</text>
+      </view>
+      <view class="member-right">
+        <view class="point-item">
+          <text class="num">1280</text>
+          <text class="label">积分</text>
+        </view>
+        <view class="point-divider"></view>
+        <view class="point-item">
+          <text class="num">3</text>
+          <text class="label">优惠券</text>
+        </view>
+      </view>
+    </view>
+
     <!-- 轮播Banner -->
     <swiper class="banner-swiper" indicator-dots autoplay circular indicator-active-color="#fff">
       <swiper-item v-for="(banner, index) in banners" :key="index">
@@ -14,29 +33,38 @@
     <!-- 快捷入口 -->
     <view class="quick-entry">
       <view class="entry-item" @click="goTab('/pages/appointment/index')">
-        <view class="entry-icon" style="background: #667eea">📅</view>
+        <view class="entry-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)">📅</view>
         <text>在线预约</text>
       </view>
       <view class="entry-item" @click="goPage('/pages/coupons/index')">
-        <view class="entry-icon" style="background: #f5576c">🎫</view>
+        <view class="entry-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%)">🎫</view>
         <text>优惠券</text>
       </view>
       <view class="entry-item" @click="goTab('/pages/member/index')">
-        <view class="entry-icon" style="background: #4facfe">👤</view>
-        <text>会员卡</text>
+        <view class="entry-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)">💳</view>
+        <text>我的卡项</text>
       </view>
       <view class="entry-item" @click="goTab('/pages/my/index')">
-        <view class="entry-icon" style="background: #43e97b">⭐</view>
+        <view class="entry-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)">👤</view>
         <text>个人中心</text>
       </view>
     </view>
 
-    <!-- 门店介绍 -->
+    <!-- 会员专属活动 -->
     <view class="section">
       <view class="section-title">
-        <text>关于我们</text>
+        <text>🎁 会员专属活动</text>
       </view>
-      <view class="about-text">{{ shopInfo.aboutUs || '专业美业护理，让美丽更简单' }}</view>
+      <view class="activity-card">
+        <view class="activity-item">
+          <view class="activity-tag" style="background: #f5576c">限时</view>
+          <text>新客首单立减50元</text>
+        </view>
+        <view class="activity-item">
+          <view class="activity-tag" style="background: #f093fb">拼团</view>
+          <text>3人成团享6折</text>
+        </view>
+      </view>
     </view>
 
     <!-- 热门项目 -->

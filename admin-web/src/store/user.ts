@@ -23,6 +23,7 @@ export const useUserStore = defineStore('user', () => {
       username: res.username,
       realName: res.realName,
       role: res.role,
+      menus: res.menus,
     }
     tenantInfo.value = res.tenant
     return res

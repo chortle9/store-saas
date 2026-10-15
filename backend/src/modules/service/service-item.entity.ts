@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
-@Entity('service_items')
+@Entity('service_items', { comment: '服务项目表' })
 export class ServiceItem {
   @PrimaryGeneratedColumn()
   id: number;
@@ -31,6 +31,12 @@ export class ServiceItem {
 
   @Column({ default: 0, comment: '排序' })
   sort: number;
+
+  @Column({ type: 'decimal', precision: 5, scale: 2, default: 0, comment: '提成比例(%)' })
+  commissionRate: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true, comment: '固定提成金额(元)，优先于比例' })
+  fixedCommission: number;
 
   @CreateDateColumn()
   createdAt: Date;

@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
-@Entity('appointments')
+@Entity('appointments', { comment: '预约表' })
 export class Appointment {
   @PrimaryGeneratedColumn()
   id: number;

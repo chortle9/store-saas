@@ -24,7 +24,7 @@
     </div>
 
     <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px">
-      <el-form :model="form" label-width="80px">
+      <el-form :model="form" label-width="100px">
         <el-form-item label="姓名">
           <el-input v-model="form.name" placeholder="员工姓名" />
         </el-form-item>
@@ -40,6 +40,38 @@
         </el-form-item>
         <el-form-item label="提成比例%">
           <el-input-number v-model="form.commissionRate" :min="0" :max="100" />
+        </el-form-item>
+        <el-divider>登录账号设置</el-divider>
+        <el-form-item label="登录账号">
+          <el-input v-model="form.username" placeholder="员工登录用的账号" />
+        </el-form-item>
+        <el-form-item label="初始密码">
+          <el-input v-model="form.password" placeholder="初始密码，比如123456" />
+        </el-form-item>
+        <el-form-item label="角色">
+          <el-select v-model="form.role" placeholder="选择角色">
+            <el-option label="老板" value="店主" />
+            <el-option label="店长" value="店长" />
+            <el-option label="收银员" value="收银员" />
+            <el-option label="技师" value="店员" />
+          </el-select>
+        </el-form-item>
+        <el-divider>菜单权限设置（这个员工能看到哪些菜单）</el-divider>
+        <el-form-item label="可见菜单">
+          <el-checkbox-group v-model="form.menus">
+            <el-checkbox value="dashboard">工作台</el-checkbox>
+            <el-checkbox value="member">会员管理</el-checkbox>
+            <el-checkbox value="appointment">预约管理</el-checkbox>
+            <el-checkbox value="service">服务项目</el-checkbox>
+            <el-checkbox value="card">卡项管理</el-checkbox>
+            <el-checkbox value="order">订单收银</el-checkbox>
+            <el-checkbox value="commission">提成管理</el-checkbox>
+            <el-checkbox value="marketing">营销中心</el-checkbox>
+            <el-checkbox value="stock">库存管理</el-checkbox>
+            <el-checkbox value="report">数据报表</el-checkbox>
+            <el-checkbox value="staff">员工管理</el-checkbox>
+            <el-checkbox value="setting">店铺设置</el-checkbox>
+          </el-checkbox-group>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -71,13 +103,21 @@ async function loadList() {
 
 function handleAdd() {
   dialogTitle.value = '新增员工'
-  form.value = { commissionRate: 10 }
+  form.value = {
+    commissionRate: 10,
+    role: '店员',
+    password: '123456',
+    menus: ['order', 'appointment', 'commission']
+  }
   dialogVisible.value = true
 }
 
 function handleEdit(row: any) {
   dialogTitle.value = '编辑员工'
-  form.value = { ...row }
+  form.value = {
+    ...row,
+    menus: row.menus || [], // 确保menus是数组
+  }
   dialogVisible.value = true
 }
 

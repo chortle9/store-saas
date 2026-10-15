@@ -1,5 +1,6 @@
 // 统一请求封装
-const BASE_URL = 'http://localhost:3000/api'
+// 手机预览时改成电脑的局域网IP，不能用localhost
+const BASE_URL = 'http://192.168.101.29:3000/api'
 
 export function request(options) {
   return new Promise((resolve, reject) => {

@@ -69,6 +69,12 @@ const routes = [
         meta: { title: '服务项目', icon: 'Goods' },
       },
       {
+        path: 'product',
+        name: 'Product',
+        component: () => import('@/views/product/index.vue'),
+        meta: { title: '商品管理', icon: 'ShoppingBag' },
+      },
+      {
         path: 'card',
         name: 'Card',
         component: () => import('@/views/card/index.vue'),
@@ -85,6 +91,18 @@ const routes = [
         name: 'Marketing',
         component: () => import('@/views/marketing/index.vue'),
         meta: { title: '营销中心', icon: 'Promotion' },
+      },
+      {
+        path: 'marketing/group-buy',
+        name: 'GroupBuy',
+        component: () => import('@/views/marketing/group-buy.vue'),
+        meta: { title: '拼团活动', icon: 'Promotion' },
+      },
+      {
+        path: 'marketing/auto-rule',
+        name: 'AutoRule',
+        component: () => import('@/views/marketing/auto-rule.vue'),
+        meta: { title: '自动化营销', icon: 'Promotion' },
       },
       {
         path: 'stock',
@@ -109,6 +127,30 @@ const routes = [
         name: 'Staff',
         component: () => import('@/views/staff/index.vue'),
         meta: { title: '员工管理', icon: 'Avatar' },
+      },
+      {
+        path: 'staff/schedule',
+        name: 'Schedule',
+        component: () => import('@/views/staff/schedule.vue'),
+        meta: { title: '员工排班', icon: 'Calendar' },
+      },
+      {
+        path: 'staff/home',
+        name: 'StaffHome',
+        component: () => import('@/views/staff/home.vue'),
+        meta: { title: '员工工作台', icon: 'HomeFilled' },
+      },
+      {
+        path: 'store',
+        name: 'Store',
+        component: () => import('@/views/store/index.vue'),
+        meta: { title: '门店管理', icon: 'OfficeBuilding' },
+      },
+      {
+        path: 'commission',
+        name: 'Commission',
+        component: () => import('@/views/commission/index.vue'),
+        meta: { title: '提成管理', icon: 'Money' },
       },
       {
         path: 'setting',

@@ -23,6 +23,9 @@ export class User {
   @Column({ default: 'admin', comment: '角色: super_admin/店主/店长/店员/财务' })
   role: string;
 
+  @Column({ type: 'simple-json', nullable: true, comment: '员工可见菜单列表' })
+  menus: string[];
+
   @Column({ default: 1, comment: '状态: 0禁用/1正常' })
   status: number;
 

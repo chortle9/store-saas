@@ -19,4 +19,19 @@ export class ReportController {
   memberAnalysis(@Req() req) {
     return this.reportService.memberAnalysis(req.user.tenantId);
   }
+
+  @Get('item-ranking')
+  itemRanking(@Req() req) {
+    return this.reportService.itemSalesRanking(req.user.tenantId);
+  }
+
+  @Get('new-old-customer')
+  newOldCustomer(@Req() req, @Query('days') days: string) {
+    return this.reportService.newOldCustomer(req.user.tenantId, +days || 30);
+  }
+
+  @Get('overview')
+  overview(@Req() req) {
+    return this.reportService.businessOverview(req.user.tenantId);
+  }
 }

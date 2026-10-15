@@ -64,3 +64,50 @@ export function getCouponList() {
 export function createCoupon(data: any) {
   return request.post('/marketing/coupons', data)
 }
+
+// 支付
+export function createPayment(data: any) {
+  return request.post('/payments', data)
+}
+
+export function mockPaySuccess(paymentNo: string) {
+  return request.post(`/payments/mock-pay/${paymentNo}`)
+}
+
+export function getPaymentList(params: any) {
+  return request.get('/payments', { params })
+}
+
+export function refundPayment(paymentNo: string, reason: string) {
+  return request.put(`/payments/refund/${paymentNo}`, { reason })
+}
+
+// 提成管理
+export function getCommissionList(params: any) {
+  return request.get('/commissions', { params })
+}
+
+export function getStaffCommissionSummary(params: any) {
+  return request.get('/commissions/staff-summary', { params })
+}
+
+export function settleCommission(data: any) {
+  return request.post('/commissions/settle', data)
+}
+
+// 拼团活动
+export function getGroupBuyList(params: any) {
+  return request.get('/group-buy', { params })
+}
+
+export function createGroupBuy(data: any) {
+  return request.post('/group-buy', data)
+}
+
+export function updateGroupBuy(id: number, data: any) {
+  return request.put(`/group-buy/${id}`, data)
+}
+
+export function deleteGroupBuy(id: number) {
+  return request.delete(`/group-buy/${id}`)
+}

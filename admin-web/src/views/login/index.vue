@@ -87,6 +87,7 @@ async function handleLogin() {
     try {
       await userStore.loginAction(loginForm.username, loginForm.password)
       ElMessage.success('登录成功')
+      // 不管是老板还是员工，都进同一个后台，只是菜单显示不一样
       router.push('/dashboard')
     } catch (error) {
       // 错误已在拦截器处理

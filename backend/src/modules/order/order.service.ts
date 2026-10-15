@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
 import { Order } from './order.entity';
 import { OrderItem } from './order-item.entity';
+import { CommissionService } from '../commission/commission.service';
 
 @Injectable()
 export class OrderService {
@@ -11,6 +12,7 @@ export class OrderService {
     private orderRepo: Repository<Order>,
     @InjectRepository(OrderItem)
     private itemRepo: Repository<OrderItem>,
+    private commissionService: CommissionService,
   ) {}
 
   /**
@@ -87,6 +89,9 @@ export class OrderService {
         ...item,
       });
     }
+
+    // 自动生成员工提成记录
+    await this.commissionService.generateCommission(tenantId, order.id, order.orderNo, items);
 
     return this.findOne(tenantId, order.id);
   }

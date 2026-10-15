@@ -57,6 +57,7 @@ export class AuthService {
         realName: user.realName,
         role: user.role,
         tenantId: user.tenantId,
+        menus: user.menus,
       },
       tenant: {
         id: tenant.id,
@@ -83,6 +84,7 @@ export class AuthService {
       realName: user.realName,
       role: user.role,
       phone: user.phone,
+      menus: user.menus,
       tenantId: user.tenantId,
       tenant: tenant ? {
         id: tenant.id,

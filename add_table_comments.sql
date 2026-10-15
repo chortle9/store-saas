@@ -1,0 +1,19 @@
+-- 给所有表加注释
+ALTER TABLE members COMMENT = '会员表';
+ALTER TABLE orders COMMENT = '订单表';
+ALTER TABLE service_items COMMENT = '服务项目表';
+ALTER TABLE products COMMENT = '商品表（实物产品）';
+ALTER TABLE staff COMMENT = '员工表';
+ALTER TABLE appointments COMMENT = '预约表';
+ALTER TABLE stores COMMENT = '门店表';
+ALTER TABLE tenants COMMENT = '租户表';
+ALTER TABLE users COMMENT = '用户表（登录账号）';
+ALTER TABLE cards COMMENT = '卡项表';
+ALTER TABLE coupons COMMENT = '优惠券表';
+ALTER TABLE group_buy_activities COMMENT = '拼团活动表';
+ALTER TABLE bargain_activities COMMENT = '砍价活动表';
+ALTER TABLE referral_records COMMENT = '转介绍记录表';
+ALTER TABLE auto_rules COMMENT = '自动化营销规则表';
+ALTER TABLE commission_records COMMENT = '提成记录表';
+ALTER TABLE staff_schedules COMMENT = '员工排班表';
+ALTER TABLE moments_materials COMMENT = '朋友圈素材表';
